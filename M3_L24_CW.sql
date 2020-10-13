@@ -26,8 +26,9 @@ CREATE TABLE training_zs.products (
 	product_name varchar(100),
 	product_code varchar(10) ,
 	description TEXT,
-	manufacturing_date date);
-	)
+	manufacturing_date date
+);
+	
 
 	
 --- 4. Korzystaj¹c ze sk³adni ALTER TABLE, dodaj klucz g³ówny do tabeli products dla pola ID.
