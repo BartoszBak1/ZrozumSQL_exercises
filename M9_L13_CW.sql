@@ -1,4 +1,3 @@
-SET client_encoding = 'UTF8';
 DROP TABLE IF EXISTS products, sales, product_manufactured_region CASCADE;
 
 CREATE TABLE products (
@@ -53,9 +52,9 @@ INSERT INTO sales (sal_description, sal_date, sal_value, sal_prd_id)
        
       
       
-/*1. Przygotuj widok bazodanowy na podstawie danych sprzeda¿owych SALES, który bêdzie
-przedstawia³ dane za ostatni kwarta³ roku 2020, dla wszystkich produktów bior¹cych
-udzia³ w transakcjach sprzeda¿owych wytworzonych w regionie EMEA. */
+/*1. Przygotuj widok bazodanowy na podstawie danych sprzedaÂ¿owych SALES, ktÃ³ry bÃªdzie
+przedstawiaÂ³ dane za ostatni kwartaÂ³ roku 2020, dla wszystkich produktÃ³w biorÂ¹cych
+udziaÂ³ w transakcjach sprzedaÂ¿owych wytworzonych w regionie EMEA. */
    
 CREATE OR REPLACE VIEW sales_for_4qaur_2020 AS 
 	SELECT s.*,
@@ -70,11 +69,11 @@ CREATE OR REPLACE VIEW sales_for_4qaur_2020 AS
 		 
 DROP VIEW sales_for_4qaur_2020;
       
-/*2. Zmieñ zapytanie z zadania pierwszego w taki sposób, aby w wynikach dodatkowo,
-obliczyæ sumê sprzeda¿y w podziale na kod produktu (product_code) sortowane wed³ug
-daty sprzeda¿y (sal_date), wynik wyœwietl dla ka¿dego wiersza (OVER). 
+/*2. ZmieÃ± zapytanie z zadania pierwszego w taki sposÃ³b, aby w wynikach dodatkowo,
+obliczyÃ¦ sumÃª sprzedaÂ¿y w podziale na kod produktu (product_code) sortowane wedÂ³ug
+daty sprzedaÂ¿y (sal_date), wynik wyÅ“wietl dla kaÂ¿dego wiersza (OVER). 
 Tak przygotowane zapytanie wykorzystaj do stworzenia widoku zmaterializowanego,
- który bêdzie móg³ byæ odœwie¿any równolegle (CONCURRENTLY).*/
+ ktÃ³ry bÃªdzie mÃ³gÂ³ byÃ¦ odÅ“wieÂ¿any rÃ³wnolegle (CONCURRENTLY).*/
       
  CREATE MATERIALIZED VIEW sales_sum_for_4q_2020 AS 
  	SELECT s.*,
@@ -95,9 +94,9 @@ REFRESH MATERIALIZED VIEW CONCURRENTLY sales_sum_for_4q_2020 ;
 
 DROP  MATERIALIZED VIEW IF EXISTS sales_sum_for_4q_2020;
 
-/*3. Stwórz zapytanie, w którego wynikach znajd¹ siê atrybuty: PRODUCT_CODE,
-REGION_NAME i tablica zawieraj¹ nazwy produktów (PRODUCT_NAME) dla
-wszystkich produktów z tabeli PRODUCTS.*/
+/*3. StwÃ³rz zapytanie, w ktÃ³rego wynikach znajdÂ¹ siÃª atrybuty: PRODUCT_CODE,
+REGION_NAME i tablica zawierajÂ¹ nazwy produktÃ³w (PRODUCT_NAME) dla
+wszystkich produktÃ³w z tabeli PRODUCTS.*/
 
 SELECT p.product_name,
 	   pmr.region_name,
@@ -106,10 +105,10 @@ FROM products p
 JOIN product_manufactured_region pmr ON pmr.id = p.product_man_region
 GROUP BY p.product_name, pmr.region_name;
 
-/*4. Dla zapytania z zdania 3 stwórz now¹ tabelê korzystaj¹c z konstrukcji CTAS. Dodaj
-dodatkowo do nowej tabeli 1 kolumnê zawieraj¹c¹ wartoœæ TRUE lub FALSE obliczan¹
-na podstawie danych z atrybutu tablicy nazw produktów dla kodu i regionu (zadanie 3)
-w taki sposób, ¿e gdy tablica zawiera wiêcej ni¿ 1 element wartoœæ ma byæ TRUE, w
+/*4. Dla zapytania z zdania 3 stwÃ³rz nowÂ¹ tabelÃª korzystajÂ¹c z konstrukcji CTAS. Dodaj
+dodatkowo do nowej tabeli 1 kolumnÃª zawierajÂ¹cÂ¹ wartoÅ“Ã¦ TRUE lub FALSE obliczanÂ¹
+na podstawie danych z atrybutu tablicy nazw produktÃ³w dla kodu i regionu (zadanie 3)
+w taki sposÃ³b, Â¿e gdy tablica zawiera wiÃªcej niÂ¿ 1 element wartoÅ“Ã¦ ma byÃ¦ TRUE, w
 przeciwnym razie FALSE.*/
  	   
 CREATE TABLE prd_reg_list AS 
@@ -127,12 +126,12 @@ GROUP BY p.product_name, pmr.region_name;
 
 DROP TABLE IF EXISTS prd_reg_list;
 
-/*5. Stwórz now¹ tabelê SALES_ARCHIVE (jako zwyk³y CREATE TABLE nie CTAS), która
-bêdzie mia³a strukturê na podstawie tabeli SALES z wyj¹tkami:
+/*5. StwÃ³rz nowÂ¹ tabelÃª SALES_ARCHIVE (jako zwykÂ³y CREATE TABLE nie CTAS), ktÃ³ra
+bÃªdzie miaÂ³a strukturÃª na podstawie tabeli SALES z wyjÂ¹tkami:
 - nowy atrybut: operation_type VARCHAR(1) NOT NULL
 - nowy atrybut: archived_at TIMESTAMP z automatycznym przypisywaniem
-wartoœci NOW()
-- atrybut created_date powinien byæ usuniêty*/
+wartoÅ“ci NOW()
+- atrybut created_date powinien byÃ¦ usuniÃªty*/
       
 CREATE TABLE IF NOT EXISTS sales_archive (
 	id SERIAL,
@@ -145,10 +144,10 @@ CREATE TABLE IF NOT EXISTS sales_archive (
 	archived_at TIMESTAMP DEFAULT now());
 
 
-/*6. Dla tabeli stworzonej w zadaniu 5, utwórz TRIGGER + FUNKCJE DLA TRIGGERA, który
-w momencie usuwania, lub aktualizacji wierszy w tabeli SALES, wstawi informacjê o
-poprzedniej wartoœci do tabeli SALES_ARCHIVE. Po przypisaniu TRIGGERA, usuñ z
-tabeli SALES wszystkie dane sprzeda¿owe z PaŸdziernika 2020 (10.2020). */
+/*6. Dla tabeli stworzonej w zadaniu 5, utwÃ³rz TRIGGER + FUNKCJE DLA TRIGGERA, ktÃ³ry
+w momencie usuwania, lub aktualizacji wierszy w tabeli SALES, wstawi informacjÃª o
+poprzedniej wartoÅ“ci do tabeli SALES_ARCHIVE. Po przypisaniu TRIGGERA, usuÃ± z
+tabeli SALES wszystkie dane sprzedaÂ¿owe z PaÅ¸dziernika 2020 (10.2020). */
 
 CREATE OR REPLACE FUNCTION archive_sales_function() 
    RETURNS TRIGGER 
