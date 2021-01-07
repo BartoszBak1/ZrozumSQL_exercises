@@ -1,3 +1,4 @@
+SET client_encoding = 'UTF8';
 DROP TABLE IF EXISTS products, sales, product_manufactured_region CASCADE;
 
 CREATE TABLE products (
@@ -52,11 +53,11 @@ INSERT INTO sales (sal_description, sal_date, sal_value, sal_prd_id)
        
       
       
-/*1. Przygotuj widok bazodanowy na podstawie danych sprzeda¿owych SALES, który bêdzie
-przedstawia³ dane za ostatni kwarta³ roku 2020, dla wszystkich produktów bior¹cych
-udzia³ w transakcjach sprzeda¿owych wytworzonych w regionie EMEA. */
+/*1. Przygotuj widok bazodanowy na podstawie danych sprzedażowych SALES, który będzie
+przedstawiał dane za ostatni kwartał roku 2020, dla wszystkich produktów biorących
+udział w transakcjach sprzedażowych wytworzonych w regionie EMEA. */
    
-CREATE OR REPLACE VIEW sales_for_4qaur_2020 AS 
+CREATE OR REPLACE VIEW v_sales_for_4qaur_2020 AS 
 	SELECT s.*,
 		  pmr.region_name	  
 	FROM sales s
@@ -67,15 +68,15 @@ CREATE OR REPLACE VIEW sales_for_4qaur_2020 AS
 			AND
 		  EXTRACT(QUARTER FROM s.sal_date) = 4;
 		 
-DROP VIEW sales_for_4qaur_2020;
+DROP VIEW v_sales_for_4qaur_2020;
       
-/*2. Zmieñ zapytanie z zadania pierwszego w taki sposób, aby w wynikach dodatkowo,
-obliczyæ sumê sprzeda¿y w podziale na kod produktu (product_code) sortowane wed³ug
-daty sprzeda¿y (sal_date), wynik wyœwietl dla ka¿dego wiersza (OVER). 
+/*2. Zmień zapytanie z zadania pierwszego w taki sposób, aby w wynikach dodatkowo,
+obliczyć sumę sprzedaży w podziale na kod produktu (product_code) sortowane według
+daty sprzedaży (sal_date), wynik wyświetl dla każdego wiersza (OVER). 
 Tak przygotowane zapytanie wykorzystaj do stworzenia widoku zmaterializowanego,
- który bêdzie móg³ byæ odœwie¿any równolegle (CONCURRENTLY).*/
+ który będzie mógł być odświeżany równolegle (CONCURRENTLY).*/
       
- CREATE MATERIALIZED VIEW sales_sum_for_4q_2020 AS 
+ CREATE MATERIALIZED VIEW mv_sales_sum_for_4q_2020 AS 
  	SELECT s.*,
  		   pmr.region_name,
  		   p.product_code,
@@ -89,26 +90,26 @@ Tak przygotowane zapytanie wykorzystaj do stworzenia widoku zmaterializowanego,
 		  EXTRACT(QUARTER FROM s.sal_date) = 4
 	WITH DATA ;
 
-CREATE UNIQUE INDEX index_view_sales_sum_for_4q_2020 ON sales_sum_for_4q_2020(id);
-REFRESH MATERIALIZED VIEW CONCURRENTLY sales_sum_for_4q_2020 ;
+CREATE UNIQUE INDEX index_view_sales_sum_for_4q_2020 ON mv_sales_sum_for_4q_2020(id);
+REFRESH MATERIALIZED VIEW CONCURRENTLY mv_sales_sum_for_4q_2020 ;
 
-DROP  MATERIALIZED VIEW IF EXISTS sales_sum_for_4q_2020;
+DROP  MATERIALIZED VIEW IF EXISTS mv_sales_sum_for_4q_2020;
 
-/*3. Stwórz zapytanie, w którego wynikach znajd¹ siê atrybuty: PRODUCT_CODE,
-REGION_NAME i tablica zawieraj¹ nazwy produktów (PRODUCT_NAME) dla
+/*3. Stwórz zapytanie, w którego wynikach znajdą się atrybuty: PRODUCT_CODE,
+REGION_NAME i tablica zawierają nazwy produktów (PRODUCT_NAME) dla
 wszystkich produktów z tabeli PRODUCTS.*/
 
 SELECT p.product_name,
 	   pmr.region_name,
 	   array_agg(p.product_name) AS product_name_list
 FROM products p 
-JOIN product_manufactured_region pmr ON pmr.id = p.product_man_region
+LEFT JOIN product_manufactured_region pmr ON pmr.id = p.product_man_region
 GROUP BY p.product_name, pmr.region_name;
 
-/*4. Dla zapytania z zdania 3 stwórz now¹ tabelê korzystaj¹c z konstrukcji CTAS. Dodaj
-dodatkowo do nowej tabeli 1 kolumnê zawieraj¹c¹ wartoœæ TRUE lub FALSE obliczan¹
+/*4. Dla zapytania z zdania 3 stwórz nową tabelę korzystając z konstrukcji CTAS. Dodaj
+dodatkowo do nowej tabeli 1 kolumnę zawierającą wartość TRUE lub FALSE obliczaną
 na podstawie danych z atrybutu tablicy nazw produktów dla kodu i regionu (zadanie 3)
-w taki sposób, ¿e gdy tablica zawiera wiêcej ni¿ 1 element wartoœæ ma byæ TRUE, w
+w taki sposób, że gdy tablica zawiera więcej niż 1 element wartość ma być TRUE, w
 przeciwnym razie FALSE.*/
  	   
 CREATE TABLE prd_reg_list AS 
@@ -126,12 +127,12 @@ GROUP BY p.product_name, pmr.region_name;
 
 DROP TABLE IF EXISTS prd_reg_list;
 
-/*5. Stwórz now¹ tabelê SALES_ARCHIVE (jako zwyk³y CREATE TABLE nie CTAS), która
-bêdzie mia³a strukturê na podstawie tabeli SALES z wyj¹tkami:
+/*5. Stwórz nową tabelę SALES_ARCHIVE (jako zwykły CREATE TABLE nie CTAS), która
+będzie miała strukturę na podstawie tabeli SALES z wyjątkami:
 - nowy atrybut: operation_type VARCHAR(1) NOT NULL
 - nowy atrybut: archived_at TIMESTAMP z automatycznym przypisywaniem
-wartoœci NOW()
-- atrybut created_date powinien byæ usuniêty*/
+wartości NOW()
+- atrybut created_date powinien być usunięty*/
       
 CREATE TABLE IF NOT EXISTS sales_archive (
 	id SERIAL,
@@ -145,9 +146,9 @@ CREATE TABLE IF NOT EXISTS sales_archive (
 
 
 /*6. Dla tabeli stworzonej w zadaniu 5, utwórz TRIGGER + FUNKCJE DLA TRIGGERA, który
-w momencie usuwania, lub aktualizacji wierszy w tabeli SALES, wstawi informacjê o
-poprzedniej wartoœci do tabeli SALES_ARCHIVE. Po przypisaniu TRIGGERA, usuñ z
-tabeli SALES wszystkie dane sprzeda¿owe z PaŸdziernika 2020 (10.2020). */
+w momencie usuwania, lub aktualizacji wierszy w tabeli SALES, wstawi informację o
+poprzedniej wartości do tabeli SALES_ARCHIVE. Po przypisaniu TRIGGERA, usuń z
+tabeli SALES wszystkie dane sprzedażowe z Października 2020 (10.2020). */
 
 CREATE OR REPLACE FUNCTION archive_sales_function() 
    RETURNS TRIGGER 
