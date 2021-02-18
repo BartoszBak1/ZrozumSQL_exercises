@@ -1,12 +1,9 @@
-SET client_encoding = 'UTF8'; 
-
-
 
 /*
- 1. Korzystaj¹c z tabel administracyjnych bazy danych. Stwórz zapytanie, którego
-wynikiem bêdzie lista obiektów:
-Tabel, widoków, indeksów, typem (t dla tabeli, v dla widoku, i dla indeksu) razem
-z ich w³aœcicielami i schematem, w jakim siê znajduj¹.
+ 1. KorzystajÄ…c z tabel administracyjnych bazy danych. StwÃ³rz zapytanie, ktÃ³rego
+wynikiem bÄ™dzie lista obiektÃ³w:
+Tabel, widokÃ³w, indeksÃ³w, typem (t dla tabeli, v dla widoku, i dla indeksu) razem
+z ich wÅ‚aÅ›cicielami i schematem, w jakim siÄ™ znajdujÄ….
 */
 
 SELECT  schemaname,	
@@ -28,9 +25,9 @@ SELECT
 	'I' AS object_type
 FROM pg_catalog.pg_indexes pi2;
 
-/*2. Korzystaj¹c z dodatku pgcrypto (lub z odpowiadaj¹cych funkcji w Twojej bazie danych).
-Zaszyfruj tekst 'ultraSilneHa3l0$567' korzystaj¹c z opcji ENCRYPT (pamiêtaj o rzutowaniu na typ bytea - ::bytea lub CAST(xxx as bytea)) or CRYPT
-Nastêpnie przedstaw sposób, sprawdzania has³a w sytuacji logowania u¿ytkownika (DECRYPT / CRYPT) */
+/*2. KorzystajÄ…c z dodatku pgcrypto (lub z odpowiadajÄ…cych funkcji w Twojej bazie danych).
+Zaszyfruj tekst 'ultraSilneHa3l0$567' korzystajÄ…c z opcji ENCRYPT (pamiÄ™taj o rzutowaniu na typ bytea - ::bytea lub CAST(xxx as bytea)) or CRYPT
+NastÄ™pnie przedstaw sposÃ³b, sprawdzania hasÅ‚a w sytuacji logowania uÅ¼ytkownika (DECRYPT / CRYPT) */
 
 CREATE TABLE user1 (
 user_name VARCHAR(100),
@@ -52,11 +49,11 @@ SELECT
 FROM user1;
  
  
-/*3. Dla danych z tabeli CUSTOMERS (skrypt poni¿ej), wykorzystaj znane Ci techniki anonimizowania danych.
-a. Pozb¹dŸ siê duplikatów.
-b. Nie pokazuj ca³ego adresu email, tylko domenê firmy (np. X@polska.pl) - dla znalezienie domeny mailowej mo¿esz wykorzystaæ REGEX - '@(.*)$'
+/*3. Dla danych z tabeli CUSTOMERS (skrypt poniÅ¼ej), wykorzystaj znane Ci techniki anonimizowania danych.
+a. PozbÄ…dÅº siÄ™ duplikatÃ³w.
+b. Nie pokazuj caÅ‚ego adresu email, tylko domenÄ™ firmy (np. X@polska.pl) - dla znalezienie domeny mailowej moÅ¼esz wykorzystaÄ‡ REGEX - '@(.*)$'
  (w substring lub REGEXP_MATCH)
-c. Poka¿ tylko 3 ostatniej cyfry numeru telefonu (resztê zast¹p X-ami)
+c. PokaÅ¼ tylko 3 ostatniej cyfry numeru telefonu (resztÄ™ zastÄ…p X-ami)
  */
 
 DROP TABLE IF EXISTS customers CASCADE;
@@ -69,10 +66,10 @@ CREATE TABLE customers (
 );
 INSERT INTO customers (c_name, c_mail, c_phone, c_description) VALUES 
 	('Krzysztof Bury', 'kbur@domein.pl', '123789456', left(md5(random()::text), 15)),
-	('Onufry Zag³oba', 'zagloba@ogniemimieczem.pl', '100000001', left(md5(random()::text), 15)),
+	('Onufry ZagÅ‚oba', 'zagloba@ogniemimieczem.pl', '100000001', left(md5(random()::text), 15)),
 	('Krzysztof Bury', 'kbur@domein.pl', '123789456', left(md5(random()::text), 15)),
-	('Pan Wo³odyjowski', 'p.wolodyj@polska.pl', '987654321', left(md5(random()::text), 15)),
-	('Micha³ Skrzetuski', 'michal<at>zamek.pl', '654987231', left(md5(random()::text), 15)),
+	('Pan WoÅ‚odyjowski', 'p.wolodyj@polska.pl', '987654321', left(md5(random()::text), 15)),
+	('MichaÅ‚ Skrzetuski', 'michal<at>zamek.pl', '654987231', left(md5(random()::text), 15)),
 	('Bohun Tuhajbejowicz', NULL, NULL, left(md5(random()::text), 15));
 	
 
